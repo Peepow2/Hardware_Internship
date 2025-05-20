@@ -1,22 +1,18 @@
-#include <HardwareSerial.h>
-
 #define Rx 16
 #define Tx 17
 
-HardwareSerial mySerial(2);
-
 void setup() 
 {
-  Serial.begin(115200);
-  mySerial.begin(9600, SERIAL_8N1, Rx, Tx);
+  Serial.begin(115200); // USB
+  Serial2.begin(9600, SERIAL_8N1, Rx, Tx); // Blue DB9
   Serial.println("ESP32 UART2 (GPIO16/17) ready.");
 }
 
 void loop() 
 {
-  if (mySerial.available()) 
+  if (Serial2.available()) 
   {
-    String received = mySerial.readStringUntil('\n');
+    String received = Serial2.readString();
     Serial.print("From CH340: ");
     Serial.println(received);
   }
