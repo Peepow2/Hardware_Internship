@@ -50,9 +50,9 @@ bool Protocol_Check(String mess)
   
   int check_sum = 0x00;
   for(char i=1;i<Num_BS-2;i++)
-    check_sum = Check_sum(check_sum, base10(frame[i][2]) * 16 +  base10(frame[i][3]));
+    check_sum = Check_sum(check_sum, base10(frame[i][2]) * 16 + base10(frame[i][3]));
 
-  if(check_sum != base10(frame[Num_BS-2][2]) * 16 +  base10(frame[Num_BS-2][3]))
+  if(check_sum != base10(frame[Num_BS-2][2]) * 16 + base10(frame[Num_BS-2][3]))
     return false;
   
   /*for(int i=0;i<Num_BS;i++)
