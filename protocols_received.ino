@@ -94,3 +94,5 @@ void loop()
 // Chouwut
 // b'\x02\\\\x01\x00\0x04'
 // b'\x02\x01\x00\x01\x05\x05\x03'
+
+// https://pastebin.com/NqjCaXGN
