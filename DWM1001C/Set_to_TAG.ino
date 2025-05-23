@@ -1,21 +1,21 @@
-#include <HardwareSerial.h>
+#define RX 16
+#define TX 17
 
-HardwareSerial dwmSerial(1);  // ใช้ UART1
-
-void sendCommand(String cmd) {
-  dwmSerial.print(cmd + "\r");
+void sendCommand(String cmd) 
+{
+  Serial1.print(cmd + "\r");
   delay(200);
-  while (dwmSerial.available()) {
-    char c = dwmSerial.read();
+  while (Serial1.available()) 
+  {
+    char c = Serial1.read();
     Serial.print(c);
   }
 }
 
-void setup() {
+void setup() 
+{
   Serial.begin(115200);
-  dwmSerial.begin(115200, SERIAL_8N1, 16, 17); // RX=GPIO16, TX=GPIO17
-
-  delay(2000); // รอโมดูลพร้อม
+  Serial1.begin(115200, SERIAL_8N1, RX, TX); // RX=GPIO16, TX=GPIO17
 
   Serial.println("ตั้งค่า DWM1001C เป็น TAG");
 
@@ -26,11 +26,12 @@ void setup() {
   delay(3000);          // รอโมดูลบู๊ตใหม่
 }
 
-void loop() {
-  if (dwmSerial.available()) {
-    String line = dwmSerial.readStringUntil('\n');
+void loop() 
+{
+  if (Serial1.available()) 
+  {
+    String line = Serial1.readStringUntil('\n');
     Serial.println("[ตำแหน่ง] " + line);
   }
-
   delay(100);
 }
