@@ -7,7 +7,7 @@ void sendCommand(String cmd)
   delay(200);
   while (Serial1.available()) 
   {
-    char c = Serial1.read();
+    btye c = Serial1.read();
     Serial.print(c);
   }
 }
