@@ -1,9 +1,18 @@
+bool valid_protocol(byte p[])
+{
+  if (!(p[0] == 0x40 && p[1] == 0x01 && p[2] == 0x00))
+    return false;
+  return true;
+}
+
+
 void sent_pos_get_protocols()
 {
   byte pos_get[] = {0x02, 0x00};
   Serial2.write(pos_get, sizeof(pos_get));
   delay(100);
 }
+
 
 float* pos_get()
 { 
