@@ -1,11 +1,3 @@
-bool valid_protocol(byte p[])
-{
-  if (!(p[0] == 0x40 && p[1] == 0x01 && p[2] == 0x00))
-    return false;
-  return true;
-}
-
-
 void sent_pos_get_protocols()
 {
   byte pos_get[] = {0x02, 0x00};
@@ -13,20 +5,18 @@ void sent_pos_get_protocols()
   delay(100);
 }
 
-
 float* pos_get()
 { 
-  int Time_out = millis();
+  sent_wake_up_protocols(); clear_protocol();
   sent_pos_get_protocols();
 
   while (!Serial2.available())
   {
     if(millis() - Time_out > 5000)
     {
-      Time_out = millis();
+      clear_protocol();
+      int Time_out = millis();
       sent_pos_get_protocols();
-      
-      //Serial.println("Time_out");
     }
   }
 
