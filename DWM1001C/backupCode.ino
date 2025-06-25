@@ -5,18 +5,23 @@
 
 byte cmd_Check_Valid_response[] = {0x40, 0x01, 0x00};
 
-byte cmd_getposTAG[] = {0x02, 0x00};
-byte cmd_getposAnchor[] = {0x0C, 0x00};
+byte cmd_getposTAG[] = {0x02, 0x00};    // Tag Position
+byte cmd_getposAnchor[] = {0x0C, 0x00}; // All location
+
+byte cmd_sleep[] = {0x0A, 0x00};
 byte cmd_reset[] = {0x14, 0x00};
 byte cmd_factory_reset[] = {0x13, 0x00};
 
+byte cmd_set_to_TAG[] = {0x05, 0x02, 0xCE, 0x00};
+byte cmd_set_to_Anchor[] = {0x07, 0x02, 0x9E, 0x00};
 
-
-byte* sent_cmd(byte cmd[], byte Size_of_cmd, byte ByteArrSize)
+byte* sent_cmd(byte cmd[], byte Size_of_cmd)
 {
   // Wake up
   Serial2.write(0x00); 
   Serial2.flush();
+
+  byte ByteArrSize = 125;
 
   while(true)
   {
@@ -80,8 +85,7 @@ byte* sent_cmd(byte cmd[], byte Size_of_cmd, byte ByteArrSize)
 
 float* pos_get()
 {
-  byte N = 20;
-  byte *TLV = sent_cmd(cmd_getposTAG, sizeof(cmd_getposTAG), N);
+  byte *TLV = sent_cmd(cmd_getposTAG, sizeof(cmd_getposTAG));
 
   float* POS = (float*)malloc(3*sizeof(float));
   POS[0] = (TLV[5]  |  TLV[6] << 8 |  TLV[7] << 16 |  TLV[8] << 24) / 1000.0;
@@ -92,17 +96,42 @@ float* pos_get()
   return POS;
 }
 
-/*void loc_get()
+void loc_get()
 {
-  byte cmd[] = {0x0B, 0x01, 0x01};
-  byte *TLV = sent_cmd(cmd, sizeof(cmd), 10);
-  for(byte i=0;i<6;i++)
+  byte N = 125;
+  byte *TLV = sent_cmd(cmd_getposAnchor, sizeof(cmd_getposAnchor));
+  for(byte i=0;i<N;i++)
   {
-    Serial.print(TLV[i], BIN);
+    Serial.print(TLV[i], HEX);
     Serial.print(" ");
   }
   Serial.println();
-}*/
+  
+  free(TLV);
+  //return POS;
+}
+
+void Reset()
+{
+  byte *TLV = sent_cmd(cmd_reset, sizeof(cmd_reset));
+  if(cmd_Check_Valid_response[0] == TLV[0] \
+    && cmd_Check_Valid_response[1] == TLV[1] \
+    && cmd_Check_Valid_response[2] == TLV[2])
+  {
+    Serial.println("Reset Complete");
+  }
+}
+
+void factory_reset()
+{
+  byte *TLV = sent_cmd(cmd_factory_reset, sizeof(cmd_factory_reset));
+  if(cmd_Check_Valid_response[0] == TLV[0] \
+    && cmd_Check_Valid_response[1] == TLV[1] \
+    && cmd_Check_Valid_response[2] == TLV[2])
+  {
+    Serial.println("Factory_reset Complete");
+  }
+}
 
 void setup() 
 {
@@ -113,13 +142,14 @@ void setup()
 void loop()
 {
   float* Position_XYZ = pos_get();
+
   //loc_get();
   
-  for(byte i=0;i<3;i++)
+  /*for(byte i=0;i<3;i++)
   {
     Serial.print(Position_XYZ[i]);
     Serial.print(" ");
   }
-  Serial.println();
+  Serial.println();*/
   delay(5000);
 }
