@@ -10,9 +10,14 @@ byte cmd_reset[] = {0x14, 0x00};
 byte head_cmd_set_to_TAG[] = {0x05, 0x02};
 byte head_cmd_set_to_Anchor[] = {0x07, 0x02};
 byte head_cmd_set_label[] = {0x1D};
-byte head_cmd_set_Bluetooth_Address[] = {0x0F};
+byte head_cmd_set_Bluetooth_Address[] = {0x0F, 0x06};
 
 byte cmd_get_config[] = {0x08, 0x00};
+
+byte min(byte a, byte b) 
+{
+  return (a<b) ? a:b;
+}
 
 byte* sent_cmd(byte cmd[])
 {
@@ -68,16 +73,19 @@ byte* sent_cmd(byte cmd[])
 
 void set_Bluetooth_Address(String _Address)
 {
-  byte* cmd_set_Bluetooth_Address = (byte*)malloc((_Address.length()+2)*sizeof(byte));
-  // {0x0F, length, Address in HEX}
+  byte* cmd_set_Bluetooth_Address = (byte*)malloc(8*sizeof(byte));
+  for(byte i=0;i<8;i++)  cmd_set_Bluetooth_Address[i] = 0x00;
+
+  // {0x0F, 0x06, First 6 char from Address in HEX}
   cmd_set_Bluetooth_Address[0] = head_cmd_set_Bluetooth_Address[0];
-  cmd_set_Bluetooth_Address[1] = _Address.length();
+  cmd_set_Bluetooth_Address[1] = head_cmd_set_Bluetooth_Address[1];
 
   // เปลี่ยน char แต่ละตัวเป็น ASCII ฐาน 16 
-  for(byte i=0;i<_Address.length();i++)
+  byte len = min(_Address.length(), 6);
+  for(byte i=0;i<len;i++)
     cmd_set_Bluetooth_Address[i+2] = int(_Address.charAt(i)); 
 
-  for(byte i=0;i<_Address.length()+2;i++)
+  for(byte i=0;i<8;i++)
   {
     Serial.print(cmd_set_Bluetooth_Address[i], HEX);
     Serial.print(" ");
@@ -133,8 +141,7 @@ bool set_to_Anchor(String Label, String Address, byte initiator, byte bridge, \
   cmd_set_to_Anchor[2] = BYTE0;
   cmd_set_to_Anchor[3] = BYTE1;
 
-  
-  Byte* Anchor = sent_cmd(cmd_set_to_Anchor);
+  byte* Anchor = sent_cmd(cmd_set_to_Anchor);
   free(cmd_set_to_Anchor);  
   
   if(Anchor != NULL) 
@@ -142,8 +149,8 @@ bool set_to_Anchor(String Label, String Address, byte initiator, byte bridge, \
     free(Anchor);
 
     byte* reset = sent_cmd(cmd_reset); free(reset);
-    //set_label(Label);
-    //set_Bluetooth_Address(Address);
+    //set_label(Label);    
+    set_Bluetooth_Address(Address);
 
     byte* config = sent_cmd(cmd_get_config);
     if(config != NULL)
