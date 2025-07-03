@@ -120,6 +120,8 @@ void set_label(String Name)
 bool set_to_Anchor(String Label, String Address, byte initiator, byte bridge, \
                     byte enc_en, byte led_en, byte ble_en, byte fw_update_en, byte uwb_mode)
 {
+  bool complete = false;
+  
   byte BYTE0 = initiator << 7 | bridge << 6 | enc_en << 5 | \
                  led_en << 4 | ble_en << 3 | fw_update_en << 2 | uwb_mode;
   byte BYTE1 = 0b00;
@@ -132,22 +134,27 @@ bool set_to_Anchor(String Label, String Address, byte initiator, byte bridge, \
   cmd_set_to_Anchor[3] = BYTE1;
 
   
-  while(sent_cmd(cmd_set_to_Anchor) == NULL);
-  free(cmd_set_to_Anchor);
-
-  byte* reset = sent_cmd(cmd_reset); free(reset);
-
-  //set_label(Label);
-  set_Bluetooth_Address(Address);
-
-  byte* config = sent_cmd(cmd_get_config);
-  if(config != NULL)
+  Byte* Anchor = sent_cmd(cmd_set_to_Anchor);
+  free(cmd_set_to_Anchor);  
+  
+  if(Anchor != NULL) 
   {
-    if((config[6] & 0b00100000) == 0b00100000)
-      Serial.println("Anchor Complete");
+    free(Anchor);
+
+    byte* reset = sent_cmd(cmd_reset); free(reset);
+    //set_label(Label);
+    //set_Bluetooth_Address(Address);
+
+    byte* config = sent_cmd(cmd_get_config);
+    if(config != NULL)
+    {
+      if((config[6] & 0b00100000) == 0b00100000)
+        Serial.println("Anchor Complete");
+      complete = true;
+    }
+    free(config);
   }
-  free(config);
-  return true;
+  return complete;
 }
 
 
