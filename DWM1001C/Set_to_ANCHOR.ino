@@ -83,13 +83,13 @@ void set_Bluetooth_Address(String _Address)
   // เปลี่ยน char แต่ละตัวเป็น ASCII ฐาน 16 
   byte len = min(_Address.length(), 6);
   for(byte i=0;i<len;i++)
-    cmd_set_Bluetooth_Address[i+2] = int(_Address.charAt(i)); 
+    cmd_set_Bluetooth_Address[i+2] = (byte)_Address.charAt(i); 
 
-  for(byte i=0;i<8;i++)
+  /*for(byte i=0;i<8;i++)
   {
     Serial.print(cmd_set_Bluetooth_Address[i], HEX);
     Serial.print(" ");
-  }Serial.println();
+  }Serial.println();*/
 
   free(sent_cmd(cmd_set_Bluetooth_Address));
   free(cmd_set_Bluetooth_Address);
@@ -105,7 +105,7 @@ void set_label(String Name)
 
   // เปลี่ยน char แต่ละตัวเป็น ASCII ฐาน 16 
   for(byte i=0;i<Name.length();i++)
-    cmd_set_Label[i+2] = int(Name.charAt(i)); 
+    cmd_set_Label[i+2] = (byte)Name.charAt(i); 
 
   for(byte i=0;i<Name.length()+2;i++)
   {
@@ -148,7 +148,6 @@ bool set_to_Anchor(String Label, String Address, byte initiator, byte bridge, \
   {
     free(Anchor);
 
-    byte* reset = sent_cmd(cmd_reset); free(reset);
     //set_label(Label);    
     set_Bluetooth_Address(Address);
 
@@ -161,9 +160,9 @@ bool set_to_Anchor(String Label, String Address, byte initiator, byte bridge, \
     }
     free(config);
   }
+  byte* reset = sent_cmd(cmd_reset); free(reset);
   return complete;
 }
-
 
 void setup() 
 {
