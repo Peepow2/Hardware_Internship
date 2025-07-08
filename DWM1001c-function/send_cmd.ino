@@ -1,6 +1,6 @@
 byte cmd_Check_Valid_response[] = {0x40, 0x01, 0x00};
 
-byte* sent_cmd(byte cmd[])
+byte* send_cmd(byte cmd[])
 {
   byte ByteArrSize = 150;
   byte *TLV_temp = (byte*)malloc(ByteArrSize * sizeof(byte));
