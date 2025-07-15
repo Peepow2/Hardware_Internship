@@ -4,7 +4,7 @@ TFT_eSPI tft = TFT_eSPI();
 
 #define SCREEN_WIDTH 240
 #define SCREEN_HEIGHT 320
-#define FONT_SIZE 2
+#define FONT_SIZE 1
 
 void printToDisplay(String S) 
 {
