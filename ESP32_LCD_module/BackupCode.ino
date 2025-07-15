@@ -2,8 +2,8 @@
 
 TFT_eSPI tft = TFT_eSPI();
 
-#define SCREEN_WIDTH 240
-#define SCREEN_HEIGHT 320
+#define SCREEN_WIDTH 320
+#define SCREEN_HEIGHT 240
 #define FONT_SIZE 1
 
 #define RX 27
@@ -77,21 +77,22 @@ byte* send_cmd(byte cmd[])
 
 void printToDisplay(float x, float y, float z) 
 {
-  tft.fillScreen(TFT_WHITE);
-  tft.setTextColor(TFT_BLACK);
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextColor(TFT_WHITE);
 
   int centerX = SCREEN_WIDTH / 2;
   int centerY = SCREEN_HEIGHT / 2;
 
-  int _x = 10; // x-coordinate of the top-left corner of the rectangle
-  int _y = 10; // y-coordinate of the top-left corner of the rectangle
+  int _x = 15; // x-coordinate of the top-left corner of the rectangle
+  int _y = 15; // y-coordinate of the top-left corner of the rectangle
   int _w = 10; // width of the rectangle
   int _h = 10; // height of the rectangle
   uint16_t color = TFT_RED; // color of the rectangle
 
+  
   tft.fillRect(_x, _y, _w, _h, color);
-
   tft.drawLine(_x+15, _y+15, centerX-10, centerY-25, TFT_GREEN);
+  tft.drawCentreString("Window", _x+5, _y+15, FONT_SIZE);
 
   tft.fillSmoothCircle(centerX, centerY-15, 4, TFT_RED);
   String S = "(" + String(x) + ", " + String(y) + ", " + String(z) + ")";
@@ -104,10 +105,7 @@ void setup()
   Serial2.begin(baud_rate, SERIAL_8N1, RX, TX);
 
   tft.init();
-  tft.setRotation(2);
-
-  tft.fillScreen(TFT_WHITE);
-  tft.setTextColor(TFT_BLACK);
+  tft.setRotation(1);
 }
 
 void loop() 
