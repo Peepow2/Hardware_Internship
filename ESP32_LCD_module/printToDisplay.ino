@@ -6,7 +6,7 @@ TFT_eSPI tft = TFT_eSPI();
 #define SCREEN_HEIGHT 320
 #define FONT_SIZE 2
 
-void printToDisplay(string S) 
+void printToDisplay(String S) 
 {
   tft.fillScreen(TFT_WHITE);
   tft.setTextColor(TFT_BLACK);
