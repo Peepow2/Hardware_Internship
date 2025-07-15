@@ -26,9 +26,6 @@ void setup()
 
   tft.fillScreen(TFT_WHITE);
   tft.setTextColor(TFT_BLACK);
-  
-  int centerX = SCREEN_WIDTH / 2;
-  int centerY = SCREEN_HEIGHT / 2;
 }
 
 void loop() 
