@@ -11,7 +11,7 @@ void printToDisplay(String S)
   tft.fillScreen(TFT_BLACK);
   tft.setTextColor(TFT_WHITE);
 
-  tft.drawCentreString(S, X_coor, Y_coor, FONT_SIZE);
+  tft.drawCentreString(S, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, FONT_SIZE);
 }
 
 void setup() 
@@ -19,7 +19,7 @@ void setup()
   Serial.begin(115200);
 
   tft.init();
-  tft.setRotation(2); // 1 Landscape, 2 Portrait
+  tft.setRotation(1); // 1 Landscape, 2 Portrait
 }
 
 void loop() 
