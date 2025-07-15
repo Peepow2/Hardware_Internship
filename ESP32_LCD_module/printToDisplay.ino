@@ -2,19 +2,16 @@
 
 TFT_eSPI tft = TFT_eSPI();
 
-#define SCREEN_WIDTH 240
-#define SCREEN_HEIGHT 320
+#define SCREEN_WIDTH 320
+#define SCREEN_HEIGHT 240
 #define FONT_SIZE 1
 
 void printToDisplay(String S) 
 {
-  tft.fillScreen(TFT_WHITE);
-  tft.setTextColor(TFT_BLACK);
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextColor(TFT_WHITE);
 
-  int centerX = SCREEN_WIDTH / 2;
-  int centerY = SCREEN_HEIGHT / 2;
-
-  tft.drawCentreString(S, centerX, centerY, FONT_SIZE);
+  tft.drawCentreString(S, X_coor, Y_coor, FONT_SIZE);
 }
 
 void setup() 
@@ -22,13 +19,10 @@ void setup()
   Serial.begin(115200);
 
   tft.init();
-  tft.setRotation(2);
-
-  tft.fillScreen(TFT_WHITE);
-  tft.setTextColor(TFT_BLACK);
+  tft.setRotation(2); // 1 Landscape, 2 Portrait
 }
 
 void loop() 
 {
-  printToDisplay(millis());
+  printToDisplay("Something");
 }
