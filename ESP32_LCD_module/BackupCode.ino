@@ -2,8 +2,8 @@
 
 TFT_eSPI tft = TFT_eSPI();
 
-#define SCREEN_WIDTH 320
-#define SCREEN_HEIGHT 240
+#define SCREEN_WIDTH 240
+#define SCREEN_HEIGHT 320
 #define FONT_SIZE 1
 
 #define RX 27
@@ -12,20 +12,7 @@ TFT_eSPI tft = TFT_eSPI();
 
 byte cmd_Check_Valid_response[] = {0x40, 0x01, 0x00};
 byte cmd_getposTAG[] = {0x02, 0x00};
-
-float* get_pos()
-{
-  byte* TLV = send_cmd(cmd_getposTAG);
-  if(TLV == NULL) return NULL;
-
-  float* POS = (float*)malloc(3*sizeof(float));
-  POS[0] = (TLV[5]  |  TLV[6] << 8 |  TLV[7] << 16 |  TLV[8] << 24) / 1000.0;
-  POS[1] = (TLV[9]  | TLV[10] << 8 | TLV[11] << 16 | TLV[12] << 24) / 1000.0;
-  POS[2] = (TLV[13] | TLV[14] << 8 | TLV[15] << 16 | TLV[16] << 24) / 1000.0;
-
-  free(TLV);
-  return POS;
-}
+byte cmd_get_All_loc[] = {0x0C, 0x00};
 
 byte* send_cmd(byte cmd[])
 {
@@ -75,28 +62,82 @@ byte* send_cmd(byte cmd[])
   return NULL;
 }
 
-void printToDisplay(float x, float y, float z) 
+struct location
+{
+  float x = 0.0, y = 0.0, z = 0.0;
+  float dist = 0.0;
+  byte N_anchor = 0;
+};
+
+struct location* get_loc()
+{
+  byte* TLV = send_cmd(cmd_get_All_loc);
+  byte Num_Anchor = TLV[20];
+
+  struct location* loc = \
+              (struct location*)malloc((Num_Anchor+1)*sizeof(struct location));
+
+  loc[0].x = (TLV[5]  |  TLV[6] << 8 |  TLV[7] << 16 |  TLV[8] << 24) / 1000.0;
+  loc[0].y = (TLV[9]  | TLV[10] << 8 | TLV[11] << 16 | TLV[12] << 24) / 1000.0;
+  loc[0].z = (TLV[13] | TLV[14] << 8 | TLV[15] << 16 | TLV[16] << 24) / 1000.0;
+  loc[0].N_anchor = Num_Anchor;
+
+  for(byte i=1;i<=Num_Anchor;i++)
+  {
+    loc[i].x = (TLV[20*i+8] | TLV[20*i+9] << 8 |\
+                   TLV[20*i+10] << 16 | TLV[20*i+11] << 24)/1000.0;
+
+    loc[i].y = (TLV[20*i+12] | TLV[20*i+13] << 8 |\
+                   TLV[20*i+14] << 16 | TLV[20*i+15] << 24)/1000.0;
+
+    loc[i].z = (TLV[20*i+16] | TLV[20*i+17] << 8 |\
+                   TLV[20*i+18] << 16 | TLV[20*i+19] << 24)/1000.0;
+  }
+  free(TLV);
+  return loc;
+}
+
+void printToDisplay(struct location* loc) 
 {
   tft.fillScreen(TFT_BLACK);
   tft.setTextColor(TFT_WHITE);
 
-  int centerX = SCREEN_WIDTH / 2;
-  int centerY = SCREEN_HEIGHT / 2;
+  int margin = 20;
+  float maxX = loc[1].x;
+  float maxY = loc[1].y;
+  float minX = loc[1].x;
+  float minY = loc[1].y;
 
-  int _x = 15; // x-coordinate of the top-left corner of the rectangle
-  int _y = 15; // y-coordinate of the top-left corner of the rectangle
-  int _w = 10; // width of the rectangle
-  int _h = 10; // height of the rectangle
-  uint16_t color = TFT_RED; // color of the rectangle
+  for(byte i=1;i<=loc[0].N_anchor;i++)
+  {
+    maxX = max(maxX, loc[i].x);
+    maxY = max(maxY, loc[i].y);
 
-  
-  tft.fillRect(_x, _y, _w, _h, color);
-  tft.drawLine(_x+15, _y+15, centerX-10, centerY-25, TFT_GREEN);
-  tft.drawCentreString("Window", _x+5, _y+15, FONT_SIZE);
+    minX = min(minX, loc[i].x);
+    minY = min(minY, loc[i].y);
+  }
 
-  tft.fillSmoothCircle(centerX, centerY-15, 4, TFT_RED);
-  String S = "(" + String(x) + ", " + String(y) + ", " + String(z) + ")";
-  tft.drawCentreString(S, centerX, centerY, FONT_SIZE);
+  int TAG_X = map(loc[0].x, minX, maxX, 0+margin, SCREEN_WIDTH-margin);
+  int TAG_Y = map(loc[0].y, minY, maxY, SCREEN_HEIGHT-margin, 0+margin);
+
+  for(byte i=1;i<=loc[0].N_anchor;i++)
+  {
+    int x = map(loc[i].x, minX, maxX, 0+margin, SCREEN_WIDTH-margin);
+    int y = map(loc[i].y, minY, maxY, SCREEN_HEIGHT-margin, 0+margin);
+
+    tft.drawLine(TAG_X, TAG_Y, x, y, TFT_GREEN);
+    tft.fillSmoothCircle(x, y, 5, TFT_WHITE);
+    tft.drawCentreString(String(i), x, y+8, FONT_SIZE);
+  }
+  tft.fillSmoothCircle(TAG_X, TAG_Y, 5, TFT_RED);
+  tft.drawCentreString("TAG", TAG_X, TAG_Y+8, FONT_SIZE);
+
+  /*for(byte i=0;i<=loc[0].N_anchor;i++)
+  {
+    Serial.print(loc[i].x); Serial.print(" ");
+    Serial.print(loc[i].y); Serial.print(" ");
+    Serial.print(loc[i].z); Serial.println("\n-------------");
+  }*/
 }
 
 void setup() 
@@ -105,12 +146,13 @@ void setup()
   Serial2.begin(baud_rate, SERIAL_8N1, RX, TX);
 
   tft.init();
-  tft.setRotation(1);
+  tft.setRotation(2);
 }
 
 void loop() 
 {
-  float* POS = get_pos();
-  printToDisplay(POS[0], POS[1], POS[2]);
-  delay(2000);
+  struct location* loc = get_loc();
+  printToDisplay(loc);
+
+  free(loc);
 }
