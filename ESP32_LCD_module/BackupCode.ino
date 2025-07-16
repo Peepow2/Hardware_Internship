@@ -67,6 +67,7 @@ struct location
   float x = 0.0, y = 0.0, z = 0.0;
   float dist = 0.0;
   byte N_anchor = 0;
+  String Label_Name = "";
 };
 
 struct location* get_loc()
@@ -99,9 +100,6 @@ struct location* get_loc()
 
 void printToDisplay(struct location* loc) 
 {
-  tft.fillScreen(TFT_BLACK);
-  tft.setTextColor(TFT_WHITE);
-
   int margin = 20;
   float maxX = loc[1].x;
   float maxY = loc[1].y;
@@ -119,6 +117,9 @@ void printToDisplay(struct location* loc)
 
   int TAG_X = map(loc[0].x, minX, maxX, 0+margin, SCREEN_WIDTH-margin);
   int TAG_Y = map(loc[0].y, minY, maxY, SCREEN_HEIGHT-margin, 0+margin);
+
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextColor(TFT_WHITE);
 
   for(byte i=1;i<=loc[0].N_anchor;i++)
   {
