@@ -6,8 +6,6 @@ for line in fp:
     MAP_maze.append(line.strip().split(","))
 fp.close()
 
-
-
 visited = [[False for i in range(len(maze[0]))] for j in range(len(maze))]
 # ------------------------------------------ #
 def out_of_area(x, y):
