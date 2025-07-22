@@ -98,47 +98,41 @@ struct location* get_loc()
   return loc;
 }
 
-void printToDisplay(struct location* loc) 
+void Show_location_LCD(struct location* loc) 
 {
-  int margin = 20;
-  float maxX = loc[1].x;
-  float maxY = loc[1].y;
-  float minX = loc[1].x;
-  float minY = loc[1].y;
-
-  for(byte i=1;i<=loc[0].N_anchor;i++)
-  {
-    maxX = max(maxX, loc[i].x);
-    maxY = max(maxY, loc[i].y);
-
-    minX = min(minX, loc[i].x);
-    minY = min(minY, loc[i].y);
-  }
-
-  int TAG_X = map(loc[0].x, minX, maxX, 0+margin, SCREEN_WIDTH-margin);
-  int TAG_Y = map(loc[0].y, minY, maxY, SCREEN_HEIGHT-margin, 0+margin);
-
-  tft.fillScreen(TFT_BLACK);
-  tft.setTextColor(TFT_WHITE);
-
-  for(byte i=1;i<=loc[0].N_anchor;i++)
-  {
-    int x = map(loc[i].x, minX, maxX, 0+margin, SCREEN_WIDTH-margin);
-    int y = map(loc[i].y, minY, maxY, SCREEN_HEIGHT-margin, 0+margin);
-
-    tft.drawLine(TAG_X, TAG_Y, x, y, TFT_GREEN);
-    tft.fillSmoothCircle(x, y, 5, TFT_WHITE);
-    tft.drawCentreString(String(i), x, y+8, FONT_SIZE);
-  }
-  tft.fillSmoothCircle(TAG_X, TAG_Y, 5, TFT_RED);
-  tft.drawCentreString("TAG", TAG_X, TAG_Y+8, FONT_SIZE);
-
   /*for(byte i=0;i<=loc[0].N_anchor;i++)
   {
-    Serial.print(loc[i].x); Serial.print(" ");
-    Serial.print(loc[i].y); Serial.print(" ");
-    Serial.print(loc[i].z); Serial.println("\n-------------");
-  }*/
+    if(i==0)  
+      Serial.println("TAG");
+    else if(i==1)
+      Serial.println("Anchor");
+    ESP32LCD.print(loc[i].x); ESP32LCD.print(" ");
+    ESP32LCD.print(loc[i].y); ESP32LCD.print(" ");
+    ESP32LCD.print(loc[i].z); ESP32LCD.println();
+  }ESP32LCD.println("-------------");*/
+
+  float minX = loc[1].x, maxX = loc[1].x;
+  float minY = loc[1].y, maxY = loc[1].y;
+  float minZ = loc[1].z, maxZ = loc[1].z;
+
+  for(byte i=2;i<=loc[0].N_anchor;i++)
+  {
+    minX = min(minX, loc[i].x);
+    minY = min(minY, loc[i].y);
+    minZ = min(minZ, loc[i].z);
+
+    maxX = max(maxX, loc[i].x);
+    maxY = max(maxY, loc[i].y);
+    maxZ = max(maxZ, loc[i].z);
+  }
+  /*ESP32LCD.print(minX); ESP32LCD.print(" ");
+  ESP32LCD.print(minY); ESP32LCD.print(" ");
+  ESP32LCD.print(minZ); ESP32LCD.println();
+
+  ESP32LCD.print(maxX); ESP32LCD.print(" ");
+  ESP32LCD.print(maxY); ESP32LCD.print(" ");
+  ESP32LCD.print(maxZ); ESP32LCD.println("");
+  ESP32LCD.println("-------------");*/
 }
 
 void setup() 
@@ -153,7 +147,7 @@ void setup()
 void loop() 
 {
   struct location* loc = get_loc();
-  printToDisplay(loc);
+  Show_location_LCD(loc);
 
   free(loc);
 }
