@@ -1,0 +1,108 @@
+bool grid[] = {1,1,1,1,1,1,1,1,1,1,\
+               1,1,0,0,0,0,0,0,0,0,\
+               1,0,1,1,0,1,1,0,1,1,\
+               1,0,1,1,0,1,1,0,1,1,\
+               1,0,1,1,0,1,1,0,1,1,\
+               1,0,1,1,0,1,1,0,1,1,\
+               1,0,1,1,0,1,1,0,1,1,\
+               1,0,1,1,0,1,1,0,1,1,\
+               1,0,1,1,0,0,0,0,1,1,\
+               1,0,1,1,0,1,1,0,1,1,\
+               1,0,1,1,0,1,1,0,1,1,\
+               1,0,1,1,0,1,1,0,1,1,\
+               1,0,0,0,0,0,0,0,0,1,\
+               0,0,1,1,1,1,1,1,1,1};
+
+struct PathInfo
+{
+  String Path = "";
+  int to = 0, dist = 0;
+};
+
+int Shortest_path()
+{
+  bool visited[140];
+  for(byte i=0;i<140;i++) visited[i] = 0;
+  
+  PathInfo Queue[150];
+  int len = 0;
+  
+  Queue[len].Path = "";
+  Queue[len].to = 130;
+  Queue[len].dist = 0;
+  len++;
+
+  while(len != 0)
+  {
+    int u = Queue[0].to;
+    int d = Queue[0].dist;
+    String P = Queue[0].Path;
+    
+    for(byte i=1;i<len;i++)
+      Queue[i-1] = Queue[i];
+    len--;
+
+    if(u==19)
+    {
+      Serial.println(P);
+      return d;
+    }
+      
+    if (!visited[u])
+    {
+      visited[u] = 1;
+      if (u+10<140 && grid[u+10]!=1)
+      {
+        Queue[len].to = u+10;
+        Queue[len].dist = d+1;
+        Queue[len].Path = P + 'D';
+        len++;        
+      }
+
+      if (u-10>=0 && grid[u-10]!=1)
+      {
+        Queue[len].to = u-10;
+        Queue[len].dist = d+1;
+        Queue[len].Path = P + 'U';
+        len++;     
+      }
+
+      if (u%10!=9 && grid[u+1]!=1)
+      {
+        Queue[len].to = u+1;
+        Queue[len].dist = d+1;
+        Queue[len].Path = P + 'R';
+        len++;           
+      }
+
+      if (u%10!=0 && grid[u-1]!=1)
+      {
+        Queue[len].to = u-1;
+        Queue[len].dist = d+1;
+        Queue[len].Path = P + 'L';
+        len++;             
+      }      
+    }
+  }
+}
+
+void setup() 
+{
+  Serial.begin(115200);
+}
+
+void loop() 
+{
+  /*for(byte i=0;i<5;i++)
+  {
+    for(byte j=0;j<5;j++)
+    {
+      Serial.print(grid[i*5+j]);
+      Serial.print(" ");
+    }Serial.println();
+  }Serial.println("\n");*/
+
+  int SHP = Shortest_path();
+  Serial.println(SHP);
+  delay(10000);
+}
