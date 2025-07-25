@@ -61,7 +61,6 @@ int Shortest_path()
     if(u==19)
     {
       Serial.println(P);
-      Serial.println(u);
       break;
     }
 
@@ -124,7 +123,6 @@ int Shortest_path()
   {
     for(byte j=0;j<10;j++)
     {
-
       if(walk[i*10+j] != '*')
         Serial.print(walk[i*10+j]+0);
       else
