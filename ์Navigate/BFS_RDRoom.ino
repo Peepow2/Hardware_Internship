@@ -13,6 +13,21 @@ bool grid[] = {1,1,1,1,1,1,1,1,1,1,\
                1,0,0,0,0,0,0,0,0,1,\
                0,0,1,1,1,1,1,1,1,1};
 
+char walk[] = {1,1,1,1,1,1,1,1,1,1,\
+               1,1,0,0,0,0,0,0,0,0,\
+               1,0,1,1,0,1,1,0,1,1,\
+               1,0,1,1,0,1,1,0,1,1,\
+               1,0,1,1,0,1,1,0,1,1,\
+               1,0,1,1,0,1,1,0,1,1,\
+               1,0,1,1,0,1,1,0,1,1,\
+               1,0,1,1,0,1,1,0,1,1,\
+               1,0,1,1,0,0,0,0,1,1,\
+               1,0,1,1,0,1,1,0,1,1,\
+               1,0,1,1,0,1,1,0,1,1,\
+               1,0,1,1,0,1,1,0,1,1,\
+               1,0,0,0,0,0,0,0,0,1,\
+               0,0,1,1,1,1,1,1,1,1};
+
 struct PathInfo
 {
   String Path = "";
@@ -24,7 +39,7 @@ int Shortest_path()
   bool visited[140];
   for(byte i=0;i<140;i++) visited[i] = 0;
   
-  PathInfo Queue[150];
+  PathInfo Queue[100];
   int len = 0;
   
   Queue[len].Path = "";
@@ -32,11 +47,12 @@ int Shortest_path()
   Queue[len].dist = 0;
   len++;
 
+  String P = "";
   while(len != 0)
   {
     int u = Queue[0].to;
     int d = Queue[0].dist;
-    String P = Queue[0].Path;
+    P = Queue[0].Path;
     
     for(byte i=1;i<len;i++)
       Queue[i-1] = Queue[i];
@@ -45,9 +61,10 @@ int Shortest_path()
     if(u==19)
     {
       Serial.println(P);
-      return d;
+      Serial.println(u);
+      break;
     }
-      
+
     if (!visited[u])
     {
       visited[u] = 1;
@@ -84,6 +101,38 @@ int Shortest_path()
       }      
     }
   }
+
+  int LEN = P.length();
+  int x = 130;
+  int Array_path[25];
+  len = 0;
+
+  walk[130] = '*';
+  for(byte i=0;i<LEN;i++)
+  {
+    char c = P.charAt(i);
+    if (c == 'L') x -= 1;
+    if (c == 'R') x += 1;
+    if (c == 'U') x -= 10;
+    if (c == 'D') x += 10;
+    Array_path[len++] = x;
+  }
+  for(byte i=0;i<LEN;i++)
+    walk[Array_path[i]] = '*';
+
+  for(byte i=0;i<14;i++)
+  {
+    for(byte j=0;j<10;j++)
+    {
+
+      if(walk[i*10+j] != '*')
+        Serial.print(walk[i*10+j]+0);
+      else
+        Serial.print('*');
+      Serial.print(" ");
+    }Serial.println();
+  }
+  return P.length();
 }
 
 void setup() 
@@ -104,5 +153,5 @@ void loop()
 
   int SHP = Shortest_path();
   Serial.println(SHP);
-  delay(10000);
+  delay(5000);
 }
