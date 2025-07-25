@@ -1,7 +1,10 @@
 byte cmd_Check_Valid_response[] = {0x40, 0x01, 0x00};
 
-byte* send_cmd(byte cmd[])
+byte* send_cmd(byte cmd[], Stream &serialPort)
 {
+  if(!connected(serialPort))
+      return NULL;
+
   byte ByteArrSize = 150;
   byte *TLV_temp = (byte*)malloc(ByteArrSize * sizeof(byte));
 
@@ -12,21 +15,21 @@ byte* send_cmd(byte cmd[])
     for(byte i=0;i<ByteArrSize;i++)  TLV_temp[i] = 0x00;
 
     byte sentcmd_Count = 0;
-    Serial2.flush();
-
-    while(sentcmd_Count <= TimeOUT && !Serial2.available())
+    flushBuffer(serialPort);
+    
+    while(sentcmd_Count <= TimeOUT && !serialPort.available())
     {
-      Serial2.write(cmd, (cmd[1]+2)*sizeof(byte));
+      serialPort.write(cmd, (cmd[1]+2)*sizeof(byte));
       sentcmd_Count++;
-      delay(1000);
+      delay(800);
     }
 
-    if(sentcmd_Count > TimeOUT && !Serial2.available())
+    if(sentcmd_Count > TimeOUT)
       continue;
-
-    while (Serial2.available() && index < ByteArrSize)
+      
+    while (serialPort.available() && index < ByteArrSize)
     {
-      byte rev = Serial2.read();
+      byte rev = serialPort.read();
       if(index > 0 || rev == cmd_Check_Valid_response[0])
       {
         TLV_temp[index++] = rev;
