@@ -1,5 +1,5 @@
-#define RX 16
-#define TX 17
+#define RX 27
+#define TX 22
 #define baud_rate 115200
 
 void setup() 
