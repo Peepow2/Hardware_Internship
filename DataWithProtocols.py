@@ -16,4 +16,4 @@ def Made_Protocols(pack_id, DATA):
 
 Data_Sent = Made_Protocols(0x01, [1, 2, 3])
 # str(b'\x02\x01\x00\x03\x01\x02\x03\x02\x04')
-print(Valid_protocols(Data_Sent))
+print(Data_Sent)
